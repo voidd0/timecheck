@@ -1,0 +1,50 @@
+{
+  "name": "@v0idd0/timecheck",
+  "version": "1.0.0",
+  "description": "timecheck — convert timestamps between unix seconds, unix ms, ISO 8601, RFC 2822, human-readable. Auto-detects input format. Stream-filter mode rewrites unix tokens in log files in place. Zero deps. Free forever from vøiddo.",
+  "main": "src/index.js",
+  "bin": {
+    "timecheck": "./bin/timecheck.js"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "timestamp",
+    "unix-timestamp",
+    "iso-8601",
+    "date-converter",
+    "epoch",
+    "log-parser",
+    "cli",
+    "devtools",
+    "voiddo"
+  ],
+  "author": "vøiddo <support@voiddo.com> (https://voiddo.com)",
+  "license": "MIT",
+  "homepage": "https://tools.voiddo.com/timecheck/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voidd0/timecheck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/voidd0/timecheck/issues",
+    "email": "support@voiddo.com"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://voiddo.com/contact/"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
+}
