@@ -1,5 +1,10 @@
 # timecheck
 
+[![npm version](https://img.shields.io/npm/v/@v0idd0/timecheck.svg?color=A0573A)](https://www.npmjs.com/package/@v0idd0/timecheck)
+[![npm downloads](https://img.shields.io/npm/dw/@v0idd0/timecheck.svg?color=1F1A14)](https://www.npmjs.com/package/@v0idd0/timecheck)
+[![License: MIT](https://img.shields.io/badge/license-MIT-A0573A.svg)](LICENSE)
+[![Node ≥14](https://img.shields.io/badge/node-%E2%89%A514-1F1A14)](package.json)
+
 Convert timestamps between unix seconds, unix ms, ISO 8601, RFC 2822, and human-readable. Auto-detects the input format. Zero deps. Free forever from vøiddo.
 
 ```
