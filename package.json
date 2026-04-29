@@ -1,6 +1,6 @@
 {
   "name": "@v0idd0/timecheck",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "timecheck — convert timestamps between unix seconds, unix ms, ISO 8601, RFC 2822, human-readable. Auto-detects input format. Stream-filter mode rewrites unix tokens in log files in place. Zero deps. Free forever from vøiddo.",
   "main": "src/index.js",
   "bin": {
@@ -42,9 +42,14 @@
     "node": ">=14"
   },
   "files": [
-    "bin",
-    "src",
-    "README.md",
-    "LICENSE"
+    "bin/",
+    "src/",
+    "LICENSE",
+    "README.md"
+  ],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
   ]
 }
