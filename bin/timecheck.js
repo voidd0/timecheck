@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 'use strict';
+if (process.argv[2] === '--version' || process.argv[2] === '-V') { console.log(require('../package.json').version); process.exit(0); }
 
 const { parseTimestamp, formatAll, replaceUnixInLine } = require('../src/index');
 
-const HELP = `timecheck — convert timestamps between unix, iso 8601, rfc 2822, human.
+const HELP = `timecheck — unix timestamp converter and log rewrite filter.
 
 Usage:
   timecheck                          show now in every format (also reads stdin)
-  timecheck "<timestamp>"            convert one timestamp
+  timecheck "<timestamp>"            convert one timestamp (auto-detects format)
   timecheck --replace-unix < log     rewrite unix tokens to ISO in stdin lines
   timecheck --json "<timestamp>"     json output
   timecheck --tz America/New_York "<timestamp>"
