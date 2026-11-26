@@ -1,7 +1,7 @@
 {
   "name": "@v0idd0/timecheck",
-  "version": "1.0.4",
-  "description": "Unix timestamp converter for seconds, milliseconds, ISO 8601, RFC 2822 and readable dates. Auto-detects input and can rewrite unix timestamps in log streams. No dependencies.",
+  "version": "1.0.5",
+  "description": "Convert unix seconds, milliseconds, ISO 8601 and RFC 2822 timestamps to every other format, in any IANA time zone. Can also rewrite unix timestamps in a log stream.",
   "main": "src/index.js",
   "bin": {
     "timecheck": "./bin/timecheck.js"
@@ -12,36 +12,29 @@
   "keywords": [
     "timestamp",
     "unix-timestamp",
-    "timestamp-converter",
     "epoch",
     "iso-8601",
     "rfc-2822",
-    "log-parser",
     "timezone",
-    "datetime",
-    "cli",
-    "devtools"
+    "log",
+    "converter",
+    "cli"
   ],
   "author": "vøiddo <support@voiddo.com> (https://voiddo.com)",
   "license": "MIT",
-  "homepage": "https://tools.voiddo.com/timecheck/",
+  "homepage": "https://voiddo.com/packages/#timecheck",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/voidd0/timecheck.git"
   },
   "bugs": {
-    "url": "https://github.com/voidd0/timecheck/issues",
-    "email": "support@voiddo.com"
-  },
-  "funding": {
-    "type": "individual",
-    "url": "https://voiddo.com/contact/"
+    "url": "https://github.com/voidd0/timecheck/issues"
   },
   "publishConfig": {
     "access": "public"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "files": [
     "bin",

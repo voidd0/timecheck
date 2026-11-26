@@ -1,4 +1,3 @@
-/* timecheck — smoke tests. Run via: node test.js */
 'use strict';
 
 const { parseTimestamp, formatAll, relativeTime, replaceUnixInLine } = require('./src/index');

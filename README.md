@@ -1,29 +1,10 @@
 # timecheck
 
-[![npm version](https://img.shields.io/npm/v/@v0idd0/timecheck.svg?color=A0573A)](https://www.npmjs.com/package/@v0idd0/timecheck)
-[![npm downloads](https://img.shields.io/npm/dw/@v0idd0/timecheck.svg?color=1F1A14)](https://www.npmjs.com/package/@v0idd0/timecheck)
-[![License: MIT](https://img.shields.io/badge/license-MIT-A0573A.svg)](LICENSE)
-[![Node ≥14](https://img.shields.io/badge/node-%E2%89%A514-1F1A14)](package.json)
+Convert a unix timestamp, an ISO 8601 date or an RFC 2822 date to every other format, in any IANA time zone. It can also rewrite unix timestamps in a log stream, so you can read them.
 
-**[Homepage](https://tools.voiddo.com/timecheck/?ref=timecheck-readme)** · **[GitHub](https://github.com/voidd0/timecheck)** · **[npm](https://www.npmjs.com/package/@v0idd0/timecheck)** · **[All tools](https://tools.voiddo.com/?ref=timecheck-catalog-readme)** · **[Contact](mailto:support@voiddo.com)**
-
----
-
-**Unix timestamp converter, epoch converter, and log rewrite filter.** Paste unix seconds, unix ms, ISO 8601, RFC 2822, or human-readable text; `timecheck` auto-detects the format, prints every representation, and rewrites unix tokens inside log files in place.
-
-If you were searching for a `currentmillis.com` alternative that also works on log files, this is the CLI.
-
-```
-$ timecheck 1706482800
-input:   1706482800  (unix_seconds)
-iso:     2024-01-28T23:00:00.000Z
-local:   2024-01-28 23:00:00 UTC  (use --tz <name> for local)
-unix s:  1706482800
-unix ms: 1706482800000
-rfc:     Sun, 28 Jan 2024 23:00:00 GMT
-rel:     2 years ago
-day:     Sunday
-```
+[![npm](https://img.shields.io/npm/v/@v0idd0/timecheck?color=00f6d0&labelColor=050914)](https://www.npmjs.com/package/@v0idd0/timecheck)
+[![test](https://github.com/voidd0/timecheck/actions/workflows/test.yml/badge.svg)](https://github.com/voidd0/timecheck/actions/workflows/test.yml)
+[![license](https://img.shields.io/badge/license-MIT-00f6d0?labelColor=050914)](LICENSE)
 
 ## Install
 
@@ -31,140 +12,101 @@ day:     Sunday
 npm install -g @v0idd0/timecheck
 ```
 
+Or run it once without installing: `npx @v0idd0/timecheck --help`. Needs Node.js 18 or newer. No dependencies.
+
+## Example
+
+Convert one timestamp to every format. Output from a real run on 2026-11-26 (the "rel" line depends on the day you run it):
+
+```console
+$ timecheck 1706482800 --tz Asia/Jerusalem
+input:   1706482800  (unix_seconds)
+iso:     2024-01-28T23:00:00.000Z
+local:   2024-01-29 01:00:00 Asia/Jerusalem
+unix s:  1706482800
+unix ms: 1706482800000
+rfc:     Sun, 28 Jan 2024 23:00:00 GMT
+rel:     3 years ago
+day:     Sunday
+```
+
+The input format is detected, no flag needed:
+
+```console
+$ timecheck "Tue, 28 Apr 2026 10:14:32 GMT"
+input:   Tue, 28 Apr 2026 10:14:32 GMT  (rfc_2822)
+iso:     2026-04-28T10:14:32.000Z
+local:   2026-04-28 10:14:32 UTC  (use --tz <name> for local)
+unix s:  1777371272
+unix ms: 1777371272000
+rfc:     Tue, 28 Apr 2026 10:14:32 GMT
+rel:     7 months ago
+day:     Tuesday
+```
+
+Rewrite unix timestamps (10 digits for seconds, 13 for milliseconds) inside a log stream:
+
+```console
+$ cat app.log
+GET /health 1706482800 ok
+sync done at 1706482860123
+
+$ timecheck --replace-unix < app.log
+GET /health 2024-01-28T23:00:00.000Z ok
+sync done at 2024-01-28T23:01:00.123Z
+```
+
 ## Usage
 
-```bash
-# Convert any timestamp
-timecheck 1706482800
-timecheck "2026-04-28T10:14:32Z"
-timecheck "Tue, 28 Apr 2026 10:14:32 GMT"
+```text
+timecheck: convert timestamps between unix, ISO 8601 and RFC 2822.
 
-# Now in every format
-timecheck
+Usage:
+  timecheck                          show now in every format (also reads stdin)
+  timecheck "<timestamp>"            convert one timestamp (auto-detects format)
+  timecheck --replace-unix < log     rewrite unix tokens to ISO in stdin lines
+  timecheck --json "<timestamp>"     json output
+  timecheck --tz America/New_York "<timestamp>"
 
-# Show local time in a specific zone
-timecheck "2026-04-28T10:14:32Z" --tz Europe/Berlin
-timecheck 1706482800 --tz Asia/Jerusalem
+Options:
+  --json                  JSON output instead of human table.
+  --tz <iana>             Show local time in this IANA zone (e.g. Europe/Berlin).
+  --replace-unix          Filter mode: rewrite unix tokens (10 or 13 digits) in
+                          stdin to ISO in stdout. No other output.
+  -h, --help              Show this help.
 
-# JSON output for scripts
-timecheck 1706482800 --json | jq .iso_8601
+Recognised inputs:
+  unix seconds  1706482800
+  unix ms       1706482800123   (numbers of 1e12 or more count as ms)
+  iso 8601      2026-04-28T10:14:32Z   2026-04-28 10:14:32+02:00
+  rfc 2822      Tue, 28 Apr 2026 10:14:32 GMT
+  literal       now
 
-# Read from stdin
-date +%s | timecheck
+Exit codes:
+  0  ok
+  1  could not parse input
+  2  invalid arguments
 
-# Replace unix tokens in a log file in place
-tail -f app.log | timecheck --replace-unix
+Examples:
+  timecheck 1706482800
+  timecheck "2026-04-28T10:14:32Z" --tz Asia/Jerusalem
+  tail -f app.log | timecheck --replace-unix
+  date +%s | timecheck --json | jq .iso_8601
+
+Docs and issues: https://github.com/voidd0/timecheck
 ```
 
-## Why teams keep `timecheck` in runbooks
+## Limits
 
-Most timestamp tools do one conversion and stop. `timecheck` is built for repeatable workflows:
-
-- **Auto-detect mode** for mixed inputs (seconds, milliseconds, ISO, RFC 2822).
-- **`--replace-unix` stream mode** that rewrites epoch tokens inside logs in-place.
-- **Stable scriptable CLI output** for CI and incident tooling.
-
-That makes it useful for:
-
-- incident triage and postmortem timelines
-- log archaeology during handoffs
-- shell pipelines feeding parsing jobs
-
-## Compared with currentmillis-style tools
-
-`timecheck` is CLI-first with no dependencies, with stream filtering built in:
-
-| Need | `timecheck` | Currentmillis-like web converters |
-|---|---|---|
-| Convert mixed timestamp formats | ✅ | sometimes |
-| Rewrite log streams without dropping context | ✅ | usually no |
-| Keep output in CI-friendly shape | ✅ | partial |
-| Zero install inside shell automation | ✅ | no |
-
-If you need quick single-value checks, those tools are still useful; if you need workflow-grade conversion, this one is usually faster.
-
-## Examples you can run immediately
-
-### Convert an epoch from a shell variable
-
-```bash
-ts=$(date +%s)
-timecheck "$ts" --tz Asia/Jerusalem
-```
-
-### Convert mixed logs and keep lines intact
-
-```bash
-cat app.log | timecheck --replace-unix > app.with-readable-times.log
-```
-
-### Feed parsed data into your own tooling
-
-```bash
-timecheck "2026-05-18T12:00:00Z" --json | jq '.unix_ms'
-```
-
-## What it auto-detects
-
-| Input | Source label |
-|---|---|
-| `1706482800` | `unix_seconds` |
-| `1706482800123` | `unix_ms` |
-| `2026-04-28T10:14:32Z` | `iso_8601` |
-| `2026-04-28 10:14:32+02:00` | `iso_8601` |
-| `Tue, 28 Apr 2026 10:14:32 GMT` | `rfc_2822` |
-| `now` | `now` |
-
-The cutoff between unix seconds and ms is ≥ 1e12 (≈ year 2001). If you've got a timestamp in the year 2001 in milliseconds, file an issue and we'll buy you a coffee.
-
-## Killer feature: `--replace-unix`
-
-Most timestamp tools take one timestamp and convert it. `timecheck --replace-unix` is a stream filter, pipe a log file in, get the same log out with unix timestamps rewritten to ISO:
-
-```bash
-$ cat /var/log/app.log
-[1706482800] auth ok user=alice
-[1706482801] db query ms=42
-[1706482802] sent reply ms=12
-
-$ cat /var/log/app.log | timecheck --replace-unix
-[2024-01-28T23:00:00.000Z] auth ok user=alice
-[2024-01-28T23:00:01.000Z] db query ms=42
-[2024-01-28T23:00:02.000Z] sent reply ms=12
-```
-
-Catches both 10-digit (seconds) and 13-digit (ms) tokens. Leaves smaller numbers (user IDs, sizes, etc.) alone.
-
-## Programmatic API
-
-```javascript
-const { parseTimestamp, formatAll } = require('@v0idd0/timecheck');
-
-const parsed = parseTimestamp('1706482800');
-const formatted = formatAll(parsed, { tz: 'Asia/Jerusalem' });
-// {
-//   input_source: "unix_seconds",
-//   iso_8601:     "2024-01-28T23:00:00.000Z",
-//   iso_local:    "2024-01-29 01:00:00 Asia/Jerusalem",
-//   unix_seconds: 1706482800,
-//   unix_ms:      1706482800000,
-//   rfc_2822:     "Sun, 28 Jan 2024 23:00:00 GMT",
-//   relative:     "2 years ago",
-//   weekday:      "Sunday",
-//   timezone_used:"Asia/Jerusalem"
-// }
-```
-
-## Exit codes
-
-- `0`: parsed and printed successfully
-- `1`: could not parse the input
-- `2`: invalid CLI arguments
+- A number of 1e12 or more is read as milliseconds, anything smaller as seconds. Strings other than numbers and `now` go through the JavaScript `Date` parser, so ambiguous formats follow what Node.js accepts.
+- `--tz` takes IANA names such as `Europe/Berlin`. An unknown name exits with code 2.
+- `--replace-unix` only touches whole tokens of exactly 10 digits (optionally with a fraction) or 13 digits.
 
 ## License
 
-MIT: part of the [vøiddo](https://voiddo.com/?ref=timecheck-studio-readme) tools collection.
+MIT, see [LICENSE](LICENSE).
 
 ---
 
-Maintained by v0idd0.
+Made by [vøiddo](https://voiddo.com/?src=gh). More command line tools: [voiddo.com/packages](https://voiddo.com/packages/?src=gh).
+We also run data scrapers for job boards, shops and ad libraries: [voiddo.com/scrapers](https://voiddo.com/scrapers/?src=gh).

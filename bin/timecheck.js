@@ -4,7 +4,7 @@ if (process.argv[2] === '--version' || process.argv[2] === '-V') { console.log(r
 
 const { parseTimestamp, formatAll, replaceUnixInLine } = require('../src/index');
 
-const HELP = `timecheck — unix timestamp converter and log rewrite filter.
+const HELP = `timecheck: convert timestamps between unix, ISO 8601 and RFC 2822.
 
 Usage:
   timecheck                          show now in every format (also reads stdin)
@@ -21,11 +21,11 @@ Options:
   -h, --help              Show this help.
 
 Recognised inputs:
-  unix seconds  — 1 706 482 800
-  unix ms       — 1 706 482 800 123
-  iso 8601      — 2026-04-28T10:14:32Z   2026-04-28 10:14:32+02:00
-  rfc 2822      — Tue, 28 Apr 2026 10:14:32 GMT
-  literal       — "now"
+  unix seconds  1706482800
+  unix ms       1706482800123   (numbers of 1e12 or more count as ms)
+  iso 8601      2026-04-28T10:14:32Z   2026-04-28 10:14:32+02:00
+  rfc 2822      Tue, 28 Apr 2026 10:14:32 GMT
+  literal       now
 
 Exit codes:
   0  ok
@@ -37,6 +37,8 @@ Examples:
   timecheck "2026-04-28T10:14:32Z" --tz Asia/Jerusalem
   tail -f app.log | timecheck --replace-unix
   date +%s | timecheck --json | jq .iso_8601
+
+Docs and issues: https://github.com/voidd0/timecheck
 `;
 
 function parseArgs(argv) {
@@ -47,14 +49,18 @@ function parseArgs(argv) {
     if (a === '-h' || a === '--help') { opts.help = true; continue; }
     if (a === '--json') { opts.json = true; continue; }
     if (a === '--replace-unix') { opts.replaceUnix = true; continue; }
-    if (a === '--tz') { opts.tz = argv[++i]; continue; }
+    if (a === '--tz') {
+      opts.tz = argv[++i];
+      if (!opts.tz) { console.error('--tz needs a time zone name'); process.exit(2); }
+      continue;
+    }
     if (a.startsWith('-')) { console.error('unknown option: ' + a); process.exit(2); }
     positional.push(a);
   }
   return { positional, opts };
 }
 
-const isTTY = process.stdout.isTTY;
+const isTTY = process.stdout.isTTY && !process.env.NO_COLOR;
 const C = {
   reset: isTTY ? '\x1b[0m' : '',
   dim:   isTTY ? '\x1b[2m' : '',
@@ -129,6 +135,11 @@ async function main() {
   } else {
     const piped = await readStdin();
     input = piped.trim() || 'now';
+  }
+
+  if (opts.tz) {
+    try { new Intl.DateTimeFormat('en-US', { timeZone: opts.tz }); }
+    catch (_) { console.error('unknown time zone: ' + opts.tz); process.exit(2); }
   }
 
   const parsed = parseTimestamp(input);

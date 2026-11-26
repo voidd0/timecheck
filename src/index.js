@@ -1,7 +1,3 @@
-// timecheck — convert timestamps between unix seconds, unix ms,
-// ISO 8601, RFC 2822, and human-readable. Auto-detects input format
-// so you can just pipe a log line in. Zero runtime dependencies.
-
 'use strict';
 
 const UNIT_NAMES = ['year', 'month', 'week', 'day', 'hour', 'minute', 'second'];
