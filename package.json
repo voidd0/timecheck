@@ -4,7 +4,7 @@
   "description": "Convert unix seconds, milliseconds, ISO 8601 and RFC 2822 timestamps to every other format, in any IANA time zone. Can also rewrite unix timestamps in a log stream.",
   "main": "src/index.js",
   "bin": {
-    "timecheck": "./bin/timecheck.js"
+    "timecheck": "bin/timecheck.js"
   },
   "scripts": {
     "test": "node test.js"
